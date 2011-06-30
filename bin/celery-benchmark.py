@@ -12,15 +12,15 @@ def dumb_test_code():
     print "result.successful() is ",result.successful()
     print "and the result is ", result.result
 
-    print "add.apply_async(args=[4, 4], serializer=\"json\")"
-    result = add.apply_async(args=[4, 4], serializer="json")
+    print "add.apply_async(args=[4, 4])"
+    result = add.apply_async(args=[4, 4])
     print "result.ready() is ",result.ready()
     print "result.get() ", result.get() #wait for the result
     print "result.successful() is ",result.successful()
     print "and the result is ", result.result
 
 def do_work():
-    result = add.apply_async(args=[4, 4], serializer="json")
+    result = add.apply_async(args=[4, 4])
     result.get() #wait for the result
 
 def calculate_results(measurements):
