@@ -29,6 +29,7 @@ import sys
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+print "ROOT is ", ROOT
 VENV = os.path.join(ROOT, '.benchmark-venv')
 WITH_VENV = os.path.join(ROOT, 'tools', 'with_venv.sh')
 PIP_REQUIRES = os.path.join(ROOT, 'tools', 'pip-requires')

@@ -74,12 +74,12 @@ def run_benchmark(iterations=100):
     result_set = calculate_results(measurements)
     print "==================================================="
     print "measurements: ", len(measurements)
-    print "minimum: %.2f " % result_set[0]
-    print "mean: %.2f " % result_set[1]
-    print "maximum: %.2f " % result_set[2]
-    print "std: %.2f " % result_set[3]
-    print "median: %.2f " % result_set[4]
-    print "p90: %.2f " % result_set[5]
+    print "minimum: %.2f ms " % (result_set[0]*1000, )
+    print "mean: %.2f ms" % (result_set[1]*1000, )
+    print "maximum: %.2f ms" % (result_set[2]*1000, )
+    print "std: %.2f ms" % (result_set[3]*1000, )
+    print "median: %.2f ms" % (result_set[4]*1000, )
+    print "p90: %.2f ms" % (result_set[5]*1000, )
     FOUT = open("benchmark_results.txt", "w")
     FOUT.write("measurements\tmin\tmean\tman\tstddev\tmedian\tp90\n")
     stringout = "%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (len(measurements),
@@ -93,4 +93,4 @@ def run_benchmark(iterations=100):
     FOUT.close()
 
 if __name__ == '__main__':
-    run_benchmark(iterations=10)
+    run_benchmark(iterations=1000)
