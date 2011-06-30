@@ -11,17 +11,20 @@ def dumb_test_code():
     print "result.get() ", result.get() #wait for the result
     print "result.successful() is ",result.successful()
     print "and the result is ", result.result
+    print "delivery_mode is ",add.delivery_mode
 
+    print "delivery_mode is ",add.delivery_mode
     print "add.apply_async(args=[4, 4])"
     result = add.apply_async(args=[4, 4])
     print "result.ready() is ",result.ready()
     print "result.get() ", result.get() #wait for the result
     print "result.successful() is ",result.successful()
     print "and the result is ", result.result
+    print "delivery_mode is ",add.delivery_mode
 
 def do_work():
     result = add.apply_async(args=[4, 4])
-    result.get() #wait for the result
+    #result.get() #wait for the result
 
 def calculate_results(measurements):
     """Take a list of measurements and calculate results from it.
@@ -93,4 +96,5 @@ def run_benchmark(iterations=100):
     FOUT.close()
 
 if __name__ == '__main__':
-    run_benchmark(iterations=1000)
+    #dumb_test_code()
+    run_benchmark(iterations=100)
