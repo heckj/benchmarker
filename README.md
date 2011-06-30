@@ -17,3 +17,8 @@ Variations to test:
 configured HA with Pacemaker
 * reconfigured Ubuntu with durable message queues on a replicated
 (GlusterFS?) volume
+
+To Do:
+======
+
+* generate celeryconfig.py automatically
