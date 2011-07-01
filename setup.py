@@ -35,9 +35,8 @@ class local_sdist(sdist):
     """Customized sdist hook - builds the ChangeLog file from VC first"""
 
     def run(self):
-        if os.path.isdir('.bzr'):
+        if os.path.isdir('.git'):
             # We're in a bzr branch
-
             log_cmd = subprocess.Popen(["git", "log", "--pretty=short"],
                                        stdout=subprocess.PIPE)
             changelog = log_cmd.communicate()[0]
