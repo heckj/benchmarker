@@ -1,4 +1,5 @@
 """ utility methods for benchmarking """
+
 def calculate_results(measurements):
     """Take a list of measurements and calculate results from it.
     Results:
