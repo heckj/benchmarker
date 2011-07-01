@@ -38,7 +38,7 @@ class local_sdist(sdist):
         if os.path.isdir('.bzr'):
             # We're in a bzr branch
 
-            log_cmd = subprocess.Popen(["bzr", "log", "--gnu"],
+            log_cmd = subprocess.Popen(["git", "log", "--pretty=short"],
                                        stdout=subprocess.PIPE)
             changelog = log_cmd.communicate()[0]
             with open("ChangeLog", "w") as changelog_file:
@@ -67,12 +67,12 @@ except:
 
 setup(
     name='openstack-benchmarks',
-    version=version.canonical_version_string(),
+    version="0.2" #version.canonical_version_string(),
     description='The openstack benchmarks provides benchmarks for '
                 'measuring the core components of OpenStack.',
     license='Apache License (2.0)',
-    author='OpenStack',
-    author_email='openstack@lists.launchpad.net',
+    author='Joe Heck',
+    author_email='heckj@mac.com',
     url='http://benchmarks.openstack.org/',
     packages=find_packages(exclude=['tests', 'bin']),
     test_suite='nose.collector',
@@ -85,5 +85,8 @@ setup(
         'Programming Language :: Python :: 2.6',
         'Environment :: No Input/Output (Daemon)',
     ],
+    requires = ['pystatd'], # pystatd for benchmark.agent
     scripts=['bin/nova-exampleservice',
-             'bin/rpc-benchmark'])
+    'bin/celery-benchmark.py'
+    'bin/rpc-benchmark.py'
+    ])
