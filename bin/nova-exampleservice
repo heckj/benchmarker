@@ -46,7 +46,7 @@ if __name__ == '__main__':
     utils.default_flagfile()
     flags.FLAGS(sys.argv)
     flags.DEFINE_string('exampleservice_manager',
-                        'benchmark.exampleservice.ExampleManager',
+                        'benchmark.nova.exampleservice.ExampleManager',
                         'Default manager for the ExampleService')
 
     logging.setup()
