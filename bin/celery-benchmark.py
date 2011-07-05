@@ -47,7 +47,7 @@ def run_benchmark(iterations=100, roundtrip=False):
     """
     command_to_run = "do_work()"
     if roundtrip:
-        command_to_run = "do_work(wait_for_result=True"
+        command_to_run = "do_work(wait_for_result=True)"
     t = timeit.Timer(stmt=command_to_run,
                      setup='from __main__ import do_work; gc.enable()')
     # run the timer against a single stmt loop 100 times
@@ -86,7 +86,7 @@ def append_results(measurements, result_set):
 if __name__ == '__main__':
     #dumb_test_code()
     start_results_log()
-    for chunk in range(1,1000):
-        (measurements,result_set) = run_benchmark(iterations=100)
+    for chunk in range(1,100):
+        (measurements,result_set) = run_benchmark(iterations=1000)
         append_results(measurements, result_set)
     print "FINI!"
