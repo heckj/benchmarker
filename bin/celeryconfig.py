@@ -10,5 +10,7 @@ CELERY_RESULT_BACKEND = "amqp"
 # modules containing works that are available through celery
 CELERY_IMPORTS = ("benchmark.celerybench.tasks", )
 
+CELERY_RESULT_PERSISTENT = False #trying to turn of durable...
+
 # to run, invoke 'celeryd -l info'
 # celeryd -l info -I tasks,handlers
