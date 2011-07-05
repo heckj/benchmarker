@@ -67,7 +67,7 @@ def run_benchmark(iterations=100, roundtrip=False):
 def start_results_log():
     """ start writing a benchmark results output file """
     FOUT = open("benchmark_results.txt", "w")
-    FOUT.write("measurements\tmin\tmean\tman\tstddev\tmedian\tp90\n")
+    FOUT.write("measurements\tmin\tmean\tmax\tstddev\tmedian\tp90\n")
     FOUT.close()
 
 def append_results(measurements, result_set):
