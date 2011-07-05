@@ -86,7 +86,8 @@ def append_results(measurements, result_set):
 if __name__ == '__main__':
     #dumb_test_code()
     start_results_log()
-    for chunk in range(1,100):
+    for chunk in range(1,50):
         (measurements,result_set) = run_benchmark(iterations=1000)
         append_results(measurements, result_set)
+        print "RUN %s COMPLETE" % (chunk, )
     print "FINI!"
