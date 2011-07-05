@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """ Benchmarking script to run celery benchmarks """
 
-import math
 import timeit
 from benchmark.celerybench.tasks import add
 from benchmark.utils import calculate_results
@@ -30,8 +29,8 @@ def dumb_test_code():
 def do_work(wait_for_result=False):
     """ here's our magic function that inserts into the message
     queue, does something, and optionally waits for a result.
-    Highly dependent on the 
-    import benchmark.celerybench.tasks module """ 
+    Highly dependent on the
+    import benchmark.celerybench.tasks module """
     result = add.apply_async(args=[4, 4])
     if wait_for_result:
         result.get() #block and wait for the result
@@ -44,7 +43,7 @@ def run_benchmark(iterations=100, roundtrip=False):
 
     for chunk in range(1,1000):
         (measurements,result_set) = run_benchmark(iterations=100)
-        append_results(measurements, result_set) 
+        append_results(measurements, result_set)
     """
     command_to_run = "do_work()"
     if roundtrip:
@@ -89,5 +88,5 @@ if __name__ == '__main__':
     start_results_log()
     for chunk in range(1,1000):
         (measurements,result_set) = run_benchmark(iterations=100)
-        append_results(measurements, result_set) 
+        append_results(measurements, result_set)
     print "FINI!"

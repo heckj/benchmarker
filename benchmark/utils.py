@@ -1,10 +1,11 @@
 """ utility methods for benchmarking """
+import math
 
 def calculate_results(measurements):
     """Take a list of measurements and calculate results from it.
     Results:
     (minimum, mean, maximum, std. deviation, median, 90th percentile)
-    This whole segment borrowed from 
+    This whole segment borrowed from
     http://www.testing-software.org/Tools/timeit/
     """
 
