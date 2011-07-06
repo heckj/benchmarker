@@ -1,2 +1,4 @@
 Celery
 eventlet
+python-gflags
+pystatsd
