@@ -9,7 +9,7 @@
 #
 #  License :: OSI Approved :: MIT License:
 #      http://www.opensource.org/licenses/mit-license
-# 
+#
 #      Permission is hereby granted, free of charge, to any person obtaining a copy
 #      of this software and associated documentation files (the "Software"), to deal
 #      in the Software without restriction, including without limitation the rights
@@ -21,7 +21,7 @@
 #      all copies or substantial portions of the Software.
 
 
-""" python utility/script to run on machines under test to spew relevant metrics 
+""" python utility/script to run on machines under test to spew relevant metrics
 to an instance of pystatsd
 """
 import re
@@ -69,7 +69,7 @@ class LocalSystem(object):
                 process_dict['command'] = process_set[10]
                 result.append(process_dict)
         else:
-            raise RuntimeError("Not implemented on sys.platform == %s" % sys.platform) 
+            raise RuntimeError("Not implemented on sys.platform == %s" % sys.platform)
         return result
 
     def hostname(self):
@@ -80,10 +80,10 @@ class LocalSystem(object):
         self.hostname_string = subprocess.Popen(["hostname"], stdout=subprocess.PIPE).communicate()[0]
         return self.hostname_string
 
-    def load_avg():
+    def load_avg(self):
         """Return a sequence of system load averages (1min, 5min, 15min).
 
-        number of jobs in the run queue or waiting for disk I/O 
+        number of jobs in the run queue or waiting for disk I/O
         averaged over 1, 5, and 15 minutes
         """
         with open('/proc/loadavg') as f:
@@ -91,10 +91,10 @@ class LocalSystem(object):
         load_avgs = [float(x) for x in line.split()[:3]]
         return load_avgs
 
-    def cpu_times():
+    def cpu_times(self):
         """Return a sequence of cpu times.
 
-        each number in the sequence is the amount of time, measured in units 
+        each number in the sequence is the amount of time, measured in units
         of USER_HZ (1/100ths of a second on most architectures), that the system
         spent in each cpu mode: (user, nice, system, idle, iowait, irq, softirq, [steal], [guest]).
 
@@ -105,14 +105,14 @@ class LocalSystem(object):
         cpu_times = [int(x) for x in line.split()[1:]]
         return cpu_times
 
-    def cpu_percents(sample_duration=1):
+    def cpu_percents(self, sample_duration=1):
         """Return a dictionary of usage percentages and cpu modes.
         elapsed cpu time samples taken at 'sample_time (seconds)' apart.
         cpu modes: 'user', 'nice', 'system', 'idle', 'iowait', 'irq', 'softirq'
         on SMP systems, these are aggregates of all processors/cores.
         """
 
-        deltas = __cpu_time_deltas(sample_duration)
+        deltas = self.__cpu_time_deltas(sample_duration)
         total = sum(deltas)
         percents = [100 - (100 * (float(total - x) / total)) for x in deltas]
 
@@ -126,23 +126,23 @@ class LocalSystem(object):
             'softirq': percents[6],
         }
 
-    def __proc_stat(stat):
+    def __proc_stat(self, stat):
         """ parses through /proc/stat and returns specific results based on variable stat """
         with open('/proc/stat') as f:
             for line in f:
                 if line.startswith(stat):
                     return int(line.split()[1])
-    
-    def procs_running():
+
+    def procs_running(self):
         """Return number of processes in runnable state."""
-        return __proc_stat('procs_running')
+        return self.__proc_stat('procs_running')
 
-    def procs_blocked():
+    def procs_blocked(self):
         """Return number of processes blocked waiting for I/O to complete."""
-        return __proc_stat('procs_blocked')
+        return self.__proc_stat('procs_blocked')
 
 
-    def disk_busy(device, sample_duration=1):
+    def disk_busy(self, device, sample_duration=1):
         """Return disk busy percent."""
         with open('/proc/diskstats') as f1:
             with open('/proc/diskstats') as f2:
@@ -157,13 +157,13 @@ class LocalSystem(object):
         for line in content2.splitlines():
             if sep in line:
                 io_ms2 = line.strip().split(sep)[1].split()[9]
-                break            
+                break
         delta = int(io_ms2) - int(io_ms1)
         total = sample_duration * 1000
         busy_pct = 100 - (100 * (float(total - delta) / total))
         return busy_pct
 
-    def disk_reads_writes(device):
+    def disk_reads_writes(self, device):
         """Return number of disk (reads, writes)."""
         with open('/proc/diskstats') as f:
             content = f.read()
@@ -173,10 +173,10 @@ class LocalSystem(object):
                 fields = line.strip().split(sep)[1].split()
                 num_reads = int(fields[0])
                 num_writes = int(fields[4])
-                break             
+                break
         return num_reads, num_writes
 
-    def disk_reads_writes_persec(device, sample_duration=1):
+    def disk_reads_writes_persec(self, device, sample_duration=1):
         """Return number of disk (reads, writes) per sec during the sample_duration."""
         with open('/proc/diskstats') as f1:
             with open('/proc/diskstats') as f2:
@@ -195,12 +195,12 @@ class LocalSystem(object):
                 fields = line.strip().split(sep)[1].split()
                 num_reads2 = int(fields[0])
                 num_writes2 = int(fields[4])
-                break            
+                break
         reads_per_sec = (num_reads2 - num_reads1) / float(sample_duration)
-        writes_per_sec = (num_writes2 - num_writes1) / float(sample_duration)   
+        writes_per_sec = (num_writes2 - num_writes1) / float(sample_duration)
         return reads_per_sec, writes_per_sec
 
-    def mem_stats():
+    def mem_stats(self):
         with open('/proc/meminfo') as f:
             for line in f:
                 if line.startswith('MemTotal:'):
@@ -209,20 +209,20 @@ class LocalSystem(object):
                     mem_used = mem_total - (int(line.split()[1]) * 1024)
         return (mem_used, mem_total)
 
-    def rx_tx_bytes(interface):  # by reading /proc
+    def rx_tx_bytes(self, interface):  # by reading /proc
         for line in open('/proc/net/dev'):
             if interface in line:
                 data = line.split('%s:' % interface)[1].split()
                 rx_bytes, tx_bytes = (int(data[0]), int(data[8]))
                 return (rx_bytes, tx_bytes)
 
-    def rx_tx_bits(interface):  # by reading /proc
+    def rx_tx_bits(self, interface):  # by reading /proc
         rx_bytes, tx_bytes = rx_tx_bytes(interface)
         rx_bits = rx_bytes * 8
         tx_bits = tx_bytes * 8
         return (rx_bits, tx_bits)
 
-    def net_stats_ifconfig(interface):  # by parsing ifconfig output   
+    def net_stats_ifconfig(self, interface):  # by parsing ifconfig output
         output = subprocess.Popen(['ifconfig', interface], stdout=subprocess.PIPE).communicate()[0]
         rx_bytes = int(re.findall('RX bytes:([0-9]*) ', output)[0])
         tx_bytes = int(re.findall('TX bytes:([0-9]*) ', output)[0])

@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 import gflags
 import sys
+import eventlet
 
+from eventlet.greenpool import GreenPool
 from benchmark.flags import FLAGS
 from benchmark.agent import LocalSystem
 from pystatsd import Client
@@ -11,18 +13,30 @@ def usage(e):
     print '%s\nUsage: %s ARGS\n%s' % (e, sys.argv[0], FLAGS)
     sys.exit(1)
 
+def _innerLoop():
+    pystats_client = Client(host=FLAGS.graphite_server, port=FLAGS.graphite_port)
+    my_system = LocalSystem()
+    die_die_die = False
+    while not(die_die_die):
+        print my_system.load_avg()
+        eventlet.sleep(1)
+
 def main(argv):
     """main setup for benchagent - runs the rest of this good stuff..."""
+
+
     try:
         argv = FLAGS(argv)
     except gflags.FlagsError as e:
         usage(e)
-    
-    print "HOST = ", FLAGS.graphite-server
-    print "PORT = ", FLAGS.graphite-port
-    
-    #pystats_client = Client(host=FLAGS.graphite-server, port=FLAGS.graphite-port)
+
+    print "HOST = ", FLAGS.graphite_server
+    print "PORT = ", FLAGS.graphite_port
     # do something interesting here...
+    pool = GreenPool()
+    pool.spawn_n(_innerLoop)
+    while(True):
+        eventlet.sleep(5)
 
 if __name__ == '__main__':
     main(sys.argv)
