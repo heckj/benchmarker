@@ -78,7 +78,7 @@ class LocalSystem(object):
             return self.hostname_string
         print "LOADING!"
         self.hostname_string = subprocess.Popen(["hostname"], stdout=subprocess.PIPE).communicate()[0]
-        return self.hostname_string
+        return self.hostname_string.rstrip("\r\n")
 
     def load_avg(self):
         """Return a sequence of system load averages (1min, 5min, 15min).
