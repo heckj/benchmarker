@@ -13,30 +13,40 @@ def usage(e):
     print '%s\nUsage: %s ARGS\n%s' % (e, sys.argv[0], FLAGS)
     sys.exit(1)
 
-def _innerLoop():
+def _innerLoop(interval=1):
+    """ loops to do recurring data collection, sleeping 'interval' (default 1) second """
     pystats_client = Client(host=FLAGS.graphite_server, port=FLAGS.graphite_port)
     my_system = LocalSystem()
+    hostname = my_system.hostname()
     die_die_die = False
     while not(die_die_die):
-        print my_system.load_avg()
+        (one, five, fifteen) = my_system.load_avg()
+        stat_dict = {}
+        stat_dict["%s.load.1" % hostname]=one
+        stat_dict["%s.load.5" % hostname]=five
+        stat_dict["%s.load.15" % hostname]=fifteen
+        for stat_name in stat_dict:
+            print stat_name, stat_dict[stat_name]
+            pystats_client.update_stats(stat_name,stat_dict[stat_name])
         eventlet.sleep(1)
 
 def main(argv):
     """main setup for benchagent - runs the rest of this good stuff..."""
 
-
     try:
         argv = FLAGS(argv)
     except gflags.FlagsError as e:
         usage(e)
-
-    print "HOST = ", FLAGS.graphite_server
-    print "PORT = ", FLAGS.graphite_port
-    # do something interesting here...
+    print "publishing stats to %s:%s (expected to be a stastd service endpoint)" % \
+            (FLAGS.graphite_server, FLAGS.graphite_port)
+    # Set up a basic pool and spawn our worker...
     pool = GreenPool()
     pool.spawn_n(_innerLoop)
-    while(True):
-        eventlet.sleep(5)
-
+    # iterate until the cows come home...
+    try:
+        while(True):
+            eventlet.sleep(5)
+    except KeyboardInterrupt:
+        sys.exit(1)
 if __name__ == '__main__':
     main(sys.argv)
