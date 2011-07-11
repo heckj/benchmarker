@@ -126,6 +126,23 @@ class LocalSystem(object):
             'softirq': percents[6],
         }
 
+    def __cpu_time_deltas(self, sample_duration):
+        """Return a sequence of cpu time deltas for a sample period.
+        elapsed cpu time samples taken at 'sample_time (seconds)' apart.
+        each value in the sequence is the amount of time, measured in units
+        of USER_HZ (1/100ths of a second on most architectures), that the system
+        spent in each cpu mode: (user, nice, system, idle, iowait, irq, softirq, [steal], [guest]).
+        on SMP systems, these are aggregates of all processors/cores.
+        """
+
+        with open('/proc/stat') as f1:
+            with open('/proc/stat') as f2:
+                line1 = f1.readline()
+                time.sleep(sample_duration)
+                line2 = f2.readline()
+        deltas = [int(b) - int(a) for a, b in zip(line1.split()[1:], line2.split()[1:])]
+        return deltas
+
     def __proc_stat(self, stat):
         """ parses through /proc/stat and returns specific results based on variable stat """
         with open('/proc/stat') as f:
