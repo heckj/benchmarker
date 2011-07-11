@@ -9,13 +9,13 @@ from benchmark.flags import FLAGS
 from benchmark.agent import LocalSystem
 from socket import socket
 
-def push_metrics_to_socket(stat_dict):
+def push_metrics_to_socket(stat_dict,DEBUG=False):
     """ takes a dict of metrics - (name,value) pairs,
     adds a timestamp and pushes to a Graphite socket connection"""
     timestamp = int(time.time())
     stat_string = ''
     for stat_name in stat_dict:
-        msg = 'benchmark.%s %s %s' % (stat_name,
+        msg = 'benchmark.%s %s %s\n' % (stat_name,
                                       stat_dict[stat_name],
                                       timestamp)
         stat_string += msg
@@ -23,7 +23,8 @@ def push_metrics_to_socket(stat_dict):
     try:
         sock.connect( (FLAGS.graphite_server, FLAGS.graphite_port) )
         sock.sendall(stat_string)
-        print(stat_string)
+        if DEBUG:
+            print(stat_string)
         sock.close()
     except:
         print "Couldn't connect to %(server)s on port %(port)d" % {
@@ -46,11 +47,25 @@ def _innerLoop(interval=1):
     while not(die_die_die):
         (one, five, fifteen) = my_system.load_avg()
         stat_dict = {}
+        # LOADAVG
         stat_dict["%s.load.1" % hostname]=one
         stat_dict["%s.load.5" % hostname]=five
         stat_dict["%s.load.15" % hostname]=fifteen
+        # CPU PERCENTS
+        percents_dict = my_system.cpu_percents()
+        for percents_key in percents_dict:
+            stat_dict["%s.%s" % (hostname, percents_dict[percents_key]) ] = percents_dict[percents_key]
+        # MEMORY
+        (memtotal, memfree) = my_system.mem_stats()
+        stat_dict["%s.memtotal" % hostname]=memtotal
+        stat_dict["%s.memfree" % hostname]=memfree
+        # NETWORK
+        (rx,tx) = my_system.net_stats_ifconfig('eth0')
+        stat_dict["%s.eth0.rx_bytes" % hostname]=rx
+        stat_dict["%s.eth0.tx_bytes" % hostname]=tx
+        # do the push to Graphite!
         push_metrics_to_socket(stat_dict)
-        eventlet.sleep(1)
+        eventlet.sleep(FLAGS.benchagent_interval)
 
 def main(argv):
     """main setup for benchagent - runs the rest of this good stuff..."""
@@ -70,5 +85,6 @@ def main(argv):
             eventlet.sleep(5)
     except KeyboardInterrupt:
         sys.exit(1)
+
 if __name__ == '__main__':
     main(sys.argv)
