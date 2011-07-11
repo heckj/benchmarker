@@ -15,25 +15,31 @@ def push_metrics_to_socket(stat_dict):
     timestamp = int(time.time())
     stat_string = ''
     for stat_name in stat_dict:
-        msg = 'benchmark.%s %s %s' % (stat_name, stat_dict[stat_name], timestamp)
+        msg = 'benchmark.%s %s %s' % (stat_name,
+                                      stat_dict[stat_name],
+                                      timestamp)
         stat_string += msg
     sock = socket()
     try:
         sock.connect( (FLAGS.graphite_server, FLAGS.graphite_port) )
         sock.sendall(stat_string)
+        print(stat_string)
         sock.close()
     except:
-        print "Couldn't connect to %(server)s on port %(port)d, is carbon-agent.py running?" \
-            % { 'server':FLAGS.graphite_server, 'port':FLAGS.graphite_port }
+        print "Couldn't connect to %(server)s on port %(port)d" % {
+            'server':FLAGS.graphite_server,
+            'port':FLAGS.graphite_port
+            }
+        print "Is carbon-agent.py running?"
         sys.exit(1)
-          
 def usage(e):
     """ prints usage for benchagent """
     print '%s\nUsage: %s ARGS\n%s' % (e, sys.argv[0], FLAGS)
     sys.exit(1)
 
 def _innerLoop(interval=1):
-    """ loops to do recurring data collection, sleeping 'interval' (default 1) second """
+    """ loops to do recurring data collection,
+    sleeping 'interval' (default 1) second """
     my_system = LocalSystem()
     hostname = my_system.hostname()
     die_die_die = False
@@ -43,7 +49,7 @@ def _innerLoop(interval=1):
         stat_dict["%s.load.1" % hostname]=one
         stat_dict["%s.load.5" % hostname]=five
         stat_dict["%s.load.15" % hostname]=fifteen
-        push_metrics_to_socket(stats_dict)
+        push_metrics_to_socket(stat_dict)
         eventlet.sleep(1)
 
 def main(argv):
